@@ -112,9 +112,21 @@ func (p *PgRepo) Save(ctx context.Context, order *domain.Order) error {
 		return err
 	}
 
-	const itemSQL = `INSERT INTO items(item_id, chrt_id, track_number, price, rid, 
-                     item_name, sale, item_size, nm_id, brand, status) 
- 					 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
+	const itemSQL = `INSERT INTO items(order_uid, chrt_id, track_number, price, rid, 
+                     item_name, sale, item_size, total_price,nm_id, brand, status) 
+ 					 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
 
-	return nil
+	batch := &pgx.Batch{}
+
+	for _, item := range order.Items {
+		batch.Queue(itemSQL, order.OrderId, item.ChrtId, item.TrackNumber, item.Price, item.RID, item.Name, item.Sale, item.Size, item.TotalPrice, item.NmID, item.Brand, item.Status)
+	}
+
+	br := tx.SendBatch(ctx, batch)
+
+	if err = br.Close(); err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
 }
