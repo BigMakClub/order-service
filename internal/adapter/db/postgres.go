@@ -130,3 +130,31 @@ func (p *PgRepo) Save(ctx context.Context, order *domain.Order) error {
 
 	return tx.Commit(ctx)
 }
+
+func (p *PgRepo) CacheRestore(ctx context.Context) ([]*domain.Order, error) {
+	result := make([]*domain.Order, 10)
+	const orderSQL = `SELECT order_uid FROM orders ORDER BY date_created DESC LIMIT 10 `
+
+	rows, err := p.pool.Query(ctx, orderSQL)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var orderUID string
+		if err = rows.Scan(&orderUID); err != nil {
+			return nil, err
+		}
+
+		order, err := p.Find(ctx, orderUID)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, order)
+	}
+
+	return result, nil
+
+}
