@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Lookup</title>
+    <style>
+        body { font-family: Arial; margin: 50px; }
+        input { padding: 10px; width: 300px; }
+        button { padding: 10px 20px; background: blue; color: white; border: none; }
+        #result { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Order Lookup</h1>
+    <input type="text" id="orderId" placeholder="Enter order ID" />
+    <button onclick="findOrder()">Search</button>
+    <div id="result"></div>
+
+    <script>
+        async function findOrder() {
+            const orderId = document.getElementById('orderId').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!orderId) {
+                resultDiv.textContent = 'Please enter order ID';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/order/${orderId}`);
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html> 

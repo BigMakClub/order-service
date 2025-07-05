@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"order-service/order-service/internal/domain"
+	"order-service/internal/domain"
 )
 
 type OrderRepository interface {

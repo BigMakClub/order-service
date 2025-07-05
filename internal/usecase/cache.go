@@ -1,6 +1,6 @@
 package usecase
 
-import "order-service/order-service/internal/domain"
+import "order-service/internal/domain"
 
 type Cache interface {
 	Get(id string) (*domain.Order, bool)
